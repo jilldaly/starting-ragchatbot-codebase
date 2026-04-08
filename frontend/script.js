@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Event Listeners
 function setupEventListeners() {
     // Chat functionality
+    document.getElementById('newChatButton').addEventListener('click', createNewSession);
     sendButton.addEventListener('click', sendMessage);
     chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') sendMessage();
@@ -125,7 +126,7 @@ function addMessage(content, type, sources = null, isWelcome = false) {
         html += `
             <details class="sources-collapsible">
                 <summary class="sources-header">Sources</summary>
-                <div class="sources-content">${sources.join(', ')}</div>
+                <div class="sources-content">${renderSources(sources)}</div>
             </details>
         `;
     }
@@ -142,6 +143,15 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Render sources as clickable links when they contain markdown link syntax [label](url)
+function renderSources(sources) {
+    return sources.map(s => {
+        const m = s.match(/^\[(.+?)\]\((.+?)\)$/);
+        if (m) return `<a class="source-chip" href="${m[2]}" target="_blank" rel="noopener noreferrer">&#x1F517; ${escapeHtml(m[1])}</a>`;
+        return `<span class="source-chip">${escapeHtml(s)}</span>`;
+    }).join('');
 }
 
 // Removed removeMessage function - no longer needed since we handle loading differently
